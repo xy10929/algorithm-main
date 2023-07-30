@@ -1,35 +1,79 @@
 package class01;
+
 //lc34
 import java.util.Arrays;
 
 public class Code05_BSNearLeft {
 
-	// 在arr上，找满足>=value的最左位置
-	public static int nearestIndex(int[] arr, int value) {
-		int L = 0;
-		int R = arr.length - 1;
-		int index = -1; // 记录最左的对号
-		while (L <= R) { // 至少一个数的时候
-			int mid = L + ((R - L) >> 1);
-			if (arr[mid] >= value) {
-				index = mid;
-				R = mid - 1;
-			} else {
-				L = mid + 1;
-			}
+	public int[] searchRange(int[] arr, int target) {
+		if (arr.length == 0) {
+			return new int[] { -1, -1 };
 		}
-		return index;
+		return new int[] { findLeft(arr, target), findRight(arr, target) };
 	}
 
-	// for test
-	public static int test(int[] arr, int value) {
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] >= value) {
-				return i;
+	public int findLeft(int[] arr, int target) {
+		int start = 0;
+		int end = arr.length - 1;
+		int ans = -1;
+		while (start <= end) {//二分 直至范围内没有数
+			int mid = (start + end) / 2;
+			if (arr[mid] == target) {
+				ans = mid;//先记录位置
+				end = mid - 1;//继续向左寻找
+			} else if (target < arr[mid]) {
+				end = mid - 1;
+			} else {
+				start = mid + 1;
 			}
 		}
-		return -1;
+		return ans;
 	}
+
+	public int findRight(int[] arr, int target) {
+		int start = 0;
+		int end = arr.length - 1;
+		int ans = -1;
+		while (start <= end) {
+			int mid = (start + end) / 2;
+			if (arr[mid] == target) {
+				ans = mid;
+				start = mid + 1;
+			} else if (target < arr[mid]) {
+				end = mid - 1;
+			} else {
+				start = mid + 1;
+			}
+		}
+		return ans;
+	}
+
+//	// 在arr上，找满足>=value的最左位置
+//	public static int nearestIndex(int[] arr, int value) {
+//		int L = 0;
+//		int R = arr.length - 1;
+//		int index = -1; // 记录最左的对号
+//		while (L <= R) { // 至少一个数的时候
+//			int mid = L + ((R - L) >> 1);
+//			if (arr[mid] >= value) {
+//				index = mid;
+//				R = mid - 1;
+//			} else {
+//				L = mid + 1;
+//			}
+//		}
+//		return index;
+//	}
+//
+//	// for test
+//	public static int test(int[] arr, int value) {
+//		for (int i = 0; i < arr.length; i++) {
+//			if (arr[i] >= value) {
+//				return i;
+//			}
+//		}
+//		return -1;
+//	}
 
 	// for test
 	public static int[] generateRandomArray(int maxSize, int maxValue) {
@@ -39,7 +83,7 @@ public class Code05_BSNearLeft {
 		}
 		return arr;
 	}
-	
+
 	// for test
 	public static void printArray(int[] arr) {
 		if (arr == null) {

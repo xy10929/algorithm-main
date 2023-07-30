@@ -1,6 +1,33 @@
 package class02;
+
 //lc136 lc260
 public class Code02_EvenTimesOddTimes {
+
+	public int singleNumber(int[] arr) {
+		int ans = 0;
+		for (int i = 0; i < arr.length; i++) {
+			ans ^= arr[i];
+		}
+		return ans;
+	}
+
+	public int[] singleNumber2(int[] arr) {
+		int eor = 0;
+		for (int i = 0; i < arr.length; i++) {
+			eor ^= arr[i];// 得到a^b
+		}
+		int rightOne = eor & (-eor);// 提取最右的1, a和b在这个位上不同
+		int num1 = 0;
+		int num2 = 0;
+		for (int i = 0; i < arr.length; i++) {
+			if ((arr[i] & rightOne) == 0) {// 根据这个位上的数为0或1, 把arr分为两类 在其中分别求a和b
+				num1 ^= arr[i];
+			} else {
+				num2 ^= arr[i];
+			}
+		}
+		return new int[] { num1, num2 };
+	}
 
 	// arr中，只有一种数，出现奇数次
 	public static void printOddTimesNum1(int[] arr) {
@@ -20,15 +47,14 @@ public class Code02_EvenTimesOddTimes {
 		// a 和 b是两种数
 		// eor != 0
 		// eor最右侧的1，提取出来
-		// eor :     00110010110111000
+		// eor : 00110010110111000
 		// rightOne :00000000000001000
 		int rightOne = eor & (-eor); // 提取出最右的1
-		
-		
+
 		int onlyOne = 0; // eor'
-		for (int i = 0 ; i < arr.length;i++) {
-			//  arr[1] =  111100011110000
-			// rightOne=  000000000010000
+		for (int i = 0; i < arr.length; i++) {
+			// arr[1] = 111100011110000
+			// rightOne= 000000000010000
 			if ((arr[i] & rightOne) != 0) {
 				onlyOne ^= arr[i];
 			}
@@ -36,31 +62,26 @@ public class Code02_EvenTimesOddTimes {
 		System.out.println(onlyOne + " " + (eor ^ onlyOne));
 	}
 
-	
 	public static int bit1counts(int N) {
 		int count = 0;
-		
-		//   011011010000
-		//   000000010000     1
-		
-		//   011011000000
-		// 
-		
-		
-		
-		while(N != 0) {
+
+		// 011011010000
+		// 000000010000 1
+
+		// 011011000000
+		//
+
+		while (N != 0) {
 			int rightOne = N & ((~N) + 1);
 			count++;
 			N ^= rightOne;
 			// N -= rightOne
 		}
-		
-		
+
 		return count;
-		
+
 	}
-	
-	
+
 	public static void main(String[] args) {
 		int a = 5;
 		int b = 7;
