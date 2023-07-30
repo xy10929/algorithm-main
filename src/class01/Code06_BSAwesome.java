@@ -1,6 +1,32 @@
 package class01;
+
 //lc162
 public class Code06_BSAwesome {
+
+	public int findPeakElement(int[] arr) {
+		if (arr.length == 1) {
+			return 0;
+		}
+		if (arr[0] > arr[1]) {//首
+			return 0;
+		}
+		if (arr[arr.length - 1] > arr[arr.length - 2]) {//末
+			return arr.length - 1;
+		}
+		int start = 1;
+		int end = arr.length - 2;//对剩下的部分进行二分
+		while (start <= end) {
+			int mid = (start + end) / 2;
+			if (arr[mid] > arr[mid - 1] && arr[mid] > arr[mid + 1]) {
+				return mid;
+			} else if (arr[mid] < arr[mid - 1]) {
+				end = mid - 1;
+			} else {
+				start = mid + 1;
+			}
+		}
+		return -1;
+	}
 
 	// 课上的代码
 	public static int getLessIndex(int[] arr) {
