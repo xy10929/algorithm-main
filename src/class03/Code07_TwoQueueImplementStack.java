@@ -1,10 +1,53 @@
 package class03;
+
 //225
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
 public class Code07_TwoQueueImplementStack {
+
+	class MyStack {
+
+		private Queue<Integer> queue;
+		private Queue<Integer> help;
+
+		public MyStack() {
+			queue = new LinkedList<>();
+			help = new LinkedList<>();
+		}
+
+		public void push(int x) {
+			queue.add(x);
+		}
+
+		public int pop() {
+			while (queue.size() > 1) {// queue留下一个用于返回 剩下的数进入help
+				help.add(queue.poll());
+			}
+			int ans = queue.poll();
+			Queue<Integer> tmp = queue;// 交换queue和help
+			queue = help;
+			help = tmp;
+			return ans;
+		}
+
+		public int top() {
+			while (queue.size() > 1) {
+				help.add(queue.poll());
+			}
+			int ans = queue.peek();
+			help.add(queue.poll());
+			Queue<Integer> tmp = queue;
+			queue = help;
+			help = tmp;
+			return ans;
+		}
+
+		public boolean empty() {
+			return queue.isEmpty();
+		}
+	}
 
 	public static class TwoQueueStack<T> {
 		public Queue<T> queue;

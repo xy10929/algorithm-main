@@ -9,23 +9,6 @@ import java.util.HashSet;
 // 返回这种数
 public class Code03_KM {
 
-	public int singleNumber(int[] arr) {
-		int[] help = new int[32];
-		for (int i = 0; i < 32; i++) {
-			for (int num : arr) {
-				help[i] += (num >> i) & 1;
-			}
-		}
-		int ans = 0;
-		for (int i = 0; i < 32; i++) {
-			help[i] %= 3;
-			if (help[i] != 0) {
-				ans |= (1 << i);
-			}
-		}
-		return ans;
-	}
-
 	public static int test(int[] arr, int k, int m) {
 		HashMap<Integer, Integer> map = new HashMap<>();
 		for (int num : arr) {

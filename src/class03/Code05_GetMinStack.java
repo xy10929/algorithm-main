@@ -1,8 +1,42 @@
 package class03;
+
 //lc155
 import java.util.Stack;
 
 public class Code05_GetMinStack {
+
+	class MinStack {
+
+		private Stack<Integer> min;
+		private Stack<Integer> data;
+
+		public MinStack() {
+			min = new Stack<Integer>();
+			data = new Stack<Integer>();
+		}
+
+		public void push(int val) {
+			if (min.isEmpty()) {
+				min.push(val);
+			} else {
+				min.push(Math.min(val, min.peek()));
+			}
+			data.push(val);
+		}
+
+		public void pop() {
+			data.pop();
+			min.pop();
+		}
+
+		public int top() {
+			return data.peek();
+		}
+
+		public int getMin() {
+			return min.peek();
+		}
+	}
 
 	public static class MyStack1 {
 		private Stack<Integer> stackData;

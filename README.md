@@ -10,6 +10,12 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc136 找到数组中唯一出现奇数次的数](#lc136)
   - [lc260 找到数组中唯二出现奇数次的数](#lc260)
   - [lc137 找到数组中唯一出现 k 次的数 其他数均出现 m 次(m>k)](#lc137)
+- [class03](#class03)
+  - [lc203 删除链表中的某个值](#lc203)
+  - [lc622 实现循环队列](#lc622)
+  - [lc155 实现可返回最小值的栈](#lc155)
+  - [lc232 用两个栈实现队列](#lc232)
+  - [lc225 用两个队列实现栈](#lc225)
 
 ## class01
 
@@ -200,5 +206,257 @@ public int singleNumber(int[] arr) {
     }
   }
   return ans;
+}
+```
+
+## class03
+
+### lc203
+
+@删除链表中的某个值  
+头结点有可能是目标值 可能需要返回新头  
+所以先找到要返回的头结点  
+用 pre 表示已经完成处理的部分的结尾  
+用 cur 表示当前到达的节点
+
+```java
+public ListNode removeElements(ListNode head, int num) {
+  while (head != null) {
+    if (head.val == num) {
+      head = head.next;
+    } else {
+      break;//找到要返回的头结点
+    }
+  }//head可能为空 即链表所有节点都要删去
+  ListNode pre = head;//已处理完成的部分的结尾
+  ListNode cur = head;//当前到达的节点
+  while (cur != null) {
+    if (cur.val == num) {
+      pre.next = cur.next;
+    } else {
+      pre = cur;
+    }
+    cur = cur.next;
+  }
+  return head;
+}
+```
+
+### lc622
+
+@实现循环队列
+
+用数组实现  
+用 begin 记录队列的首位置 即从队列弹出元素时的 index  
+用 end 记录队列需要加元素时要放的位置  
+(begin 和 end 的值可用于判断是否到达数组结构的末端 需要跳转)  
+用 size 记录队列中的数量 用于判断能否增删
+
+```java
+class MyCircularQueue {
+
+  private int[] arr;
+  private int begin;
+  private int end;
+  private int size;
+  private final int limit;
+
+  public MyCircularQueue(int limit) {
+    arr = new int[limit];
+    begin = 0;// 队列首位置
+    end = 0;// 加元素时要放入的位置
+    size = 0;// 队列元素数量
+    this.limit = limit;
+  }
+
+  public boolean enQueue(int value) {
+    if (size == limit) {
+      return false;
+    }
+    size++;
+    arr[end] = value;
+    end = end == limit - 1 ? 0 : end + 1;
+    return true;
+  }
+
+  public boolean deQueue() {
+    if (size == 0) {
+      return false;
+    }
+    size--;
+    begin = begin == limit - 1 ? 0 : begin + 1;
+    return true;
+  }
+
+  public int Front() {
+    if (size == 0) {
+      return -1;
+    }
+    return arr[begin];
+  }
+
+  public int Rear() {
+    if (size == 0) {
+      return -1;
+    }
+    return end == 0 ? arr[limit - 1] : arr[end - 1];
+  }
+
+  public boolean isEmpty() {
+    return size == 0;
+  }
+
+  public boolean isFull() {
+    return size == limit;
+  }
+}
+```
+
+### lc155
+
+@实现可返回最小值的栈, pop push getMin 操作的时间复杂度都是 O(1)
+
+准备同步增删的数据栈和最小栈  
+压入数据时  
+如果 min 栈为空 则和数据栈压入相同的数据  
+如果 min 栈不为空 则比较该数据和 min 栈栈顶 将较小值压入  
+弹出时也同步弹出
+
+```java
+class MinStack {
+
+  private Stack<Integer> min;
+  private Stack<Integer> data;
+
+  public MinStack() {
+    min = new Stack<Integer>();
+    data = new Stack<Integer>();
+  }
+
+  public void push(int val) {
+    if (min.isEmpty()) {
+      min.push(val);
+    } else {
+      min.push(Math.min(val, min.peek()));
+    }
+    data.push(val);
+  }
+
+  public void pop() {
+    data.pop();
+    min.pop();
+  }
+
+  public int top() {
+    return data.peek();
+  }
+
+  public int getMin() {
+    return min.peek();
+  }
+}
+```
+
+### lc232
+
+@用两个栈实现队列
+
+把获得的数据压入 push 栈 再依次弹出 压入 pop 栈  
+需要数据时 从 pop 栈弹出 即可实现数据的先进先出
+
+push 栈向 pop 栈倒数据的过程需把数据全部倒完 且只有在 pop 栈为空时才能进行
+
+```java
+class MyQueue {
+
+  private Stack<Integer> push;
+  private Stack<Integer> pop;
+
+  public MyQueue() {
+    push = new Stack<Integer>();
+    pop = new Stack<Integer>();
+  }
+
+  private void pushData() {// push栈向pop栈倒倒数据
+    if (pop.isEmpty()) {// pop栈为空时才能倒数据
+      while (!push.isEmpty()) {// 需要把push栈的数据全部倒出
+        pop.push(push.pop());
+      }
+    }
+  }
+
+  // 进行任何操作前先倒数据
+
+  public void push(int x) {
+    pushData();
+    push.push(x);
+  }
+
+  public int pop() {
+    pushData();
+    return pop.pop();
+  }
+
+  public int peek() {
+    pushData();
+    return pop.peek();
+  }
+
+  public boolean empty() {
+    pushData();
+    return pop.isEmpty();
+  }
+}
+```
+
+### lc225
+
+@用两个队列实现栈
+
+两个队列分别为 queue 和 help  
+当需要返回数据时 把 queue 的数据留下一个 剩下的弹出到 help, 返回留下的数据  
+最后交换 queue 和 help 的引用
+
+```java
+class MyStack {
+
+  private Queue<Integer> queue;
+  private Queue<Integer> help;
+
+  public MyStack() {
+    queue = new LinkedList<>();
+    help = new LinkedList<>();
+  }
+
+  public void push(int x) {
+    queue.add(x);
+  }
+
+  public int pop() {
+    while (queue.size() > 1) {// queue留下一个用于返回 剩下的数进入help
+      help.add(queue.poll());
+    }
+    int ans = queue.poll();
+    Queue<Integer> tmp = queue;// 交换queue和help
+    queue = help;
+    help = tmp;
+    return ans;
+  }
+
+  public int top() {
+    while (queue.size() > 1) {
+      help.add(queue.poll());
+    }
+    int ans = queue.peek();
+    help.add(queue.poll());
+    Queue<Integer> tmp = queue;
+    queue = help;
+    help = tmp;
+    return ans;
+  }
+
+  public boolean empty() {
+    return queue.isEmpty();
+  }
 }
 ```
