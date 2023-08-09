@@ -477,8 +477,8 @@ class MyStack {
 即对一个数的左边的数的情况进行统计  
 对前缀和数组使用 merge sort 并改写 对于右组的每个数 k 求左组(已有序)有多少数在[k-upper,k-lower]
 
-用递归函数计算总个数 返回值为递归地计算出的左组范围和右组范围的结果 加上两组 merge 过程中的结果  
-merge 函数中 先求对于右组每个数 k,左组(已经过 merge)有多少数在[k-upper,k-lower],再把它们排有序
+用递归函数计算总个数 返回值为 递归地计算出的左组范围和右组范围内的结果 + 两组 merge 过程中的结果  
+merge 函数中 先求对于右组每个数 k, 左组(已经过 merge)有多少数在[k-upper,k-lower],再把它们排有序
 
 因为左右组都已有序 所以可以用不回退的滑动窗口求对于右组某个数 左组中符合[k-upper,k-lower]的数的范围 进而知道数的个数
 
@@ -540,5 +540,41 @@ public int merge(long[] arr, int start, int mid, int end, int lower, int upper) 
     arr[start + i] = help[i];
   }
   return ans;
+}
+```
+
+@快速排序
+
+```java
+public void quickSort(int[] arr, int start, int end) {
+  if (start >= end) {
+    return;
+  }
+  int pivot_pos = partition(arr, start, end);
+  quickSort(arr, start, pivot_pos - 1);
+  quickSort(arr, pivot_pos + 1, end);
+}
+
+public int partition(int[] arr, int start, int end) {
+  swap(arr, start + (int) (Math.random() * (end - start + 1)), end);
+  int pivot = arr[end];
+  // 小于等于区最后位置
+  int i = start - 1;
+  // 小于等于区 start 到 i
+  // 大于区 i + 1 到 cur - 1
+  for (int cur = start; cur <= end - 1; cur++) {
+    if (arr[cur] <= pivot) {
+      swap(arr, cur, i + 1);
+      i++;
+    }
+  }
+  swap(arr, end, i + 1);
+  return i + 1;
+}
+
+public void swap(int[] arr, int i, int j) {
+  int tmp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = tmp;
 }
 ```
