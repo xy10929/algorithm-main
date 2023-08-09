@@ -16,6 +16,8 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc155 实现可返回最小值的栈](#lc155)
   - [lc232 用两个栈实现队列](#lc232)
   - [lc225 用两个队列实现栈](#lc225)
+- [class05](#class05)
+  - [lc327 求数组中有多少子数组累加和在目标范围内](#lc327)
 
 ## class01
 
@@ -373,8 +375,8 @@ class MyQueue {
   private Stack<Integer> pop;
 
   public MyQueue() {
-    push = new Stack<Integer>();
-    pop = new Stack<Integer>();
+    push = new Stack<>();
+    pop = new Stack<>();
   }
 
   private void pushData() {// push栈向pop栈倒倒数据
@@ -458,5 +460,85 @@ class MyStack {
   public boolean empty() {
     return queue.isEmpty();
   }
+}
+```
+
+## class05
+
+### lc327
+
+@求数组中有多少子数组累加和在目标范围内
+
+分别求出以每个位置结尾的子数组中符合要求的子数组个数 再把它们相加
+
+生成前缀和数组 用于直接获得前缀和  
+对于某个位置 已知目标范围[upper,lower]和其前缀和 k, 以它结尾的子数组中符合要求的子数组个数 即 求该位置之前有多少前缀和落在[k-upper,k-lower]
+
+即对一个数的左边的数的情况进行统计  
+对前缀和数组使用 merge sort 并改写 对于右组的每个数 k 求左组(已有序)有多少数在[k-upper,k-lower]
+
+用递归函数计算总个数 返回值为递归地计算出的左组范围和右组范围的结果 加上两组 merge 过程中的结果  
+merge 函数中 先求对于右组每个数 k,左组(已经过 merge)有多少数在[k-upper,k-lower],再把它们排有序
+
+因为左右组都已有序 所以可以用不回退的滑动窗口求对于右组某个数 左组中符合[k-upper,k-lower]的数的范围 进而知道数的个数
+
+```java
+public int countRangeSum(int[] nums, int lower, int upper) {
+  int n = nums.length;
+  long[] sum = new long[n];// 前缀和数组
+  sum[0] = nums[0];
+  for (int i = 1; i < n; i++) {
+    sum[i] = sum[i - 1] + nums[i];
+  }
+  return f(sum, 0, n - 1, lower, upper);
+}
+
+public int f(long[] sum, int start, int end, int lower, int upper) {
+  if (start == end) {// base case 只传进来sum[]中的某一个数sum[x](数组0到x位置的累加和) 即判断0到x位置这个子数组是否达标
+    return sum[start] >= lower && sum[start] <= upper ? 1 : 0;
+  }
+  int mid = (start + end) / 2;
+  return f(sum, start, mid, lower, upper) + f(sum, mid + 1, end, lower, upper)
+      + merge(sum, start, mid, end, lower, upper);
+}
+
+// 左组右组已经f计算出组内的结果 且组内已有序
+// 现将左右组合并为一个组 根据前缀和的性质 计算跨组的子数组中符合条件的结果数
+// 对于右组每个数k 求左组有多少数在[k-upper,k-lower] 累加得到返回值
+public int merge(long[] arr, int start, int mid, int end, int lower, int upper) {
+  int ans = 0;
+  int L = start;
+  int R = start;
+  // 窗口为[L,R) 边界只会不回退地向右
+  // 依次计算对于右组的每个数 左组有多少数在对应的范围
+  for (int i = mid + 1; i <= end; i++) {
+    long min = arr[i] - upper;
+    long max = arr[i] - lower;
+    while (L <= mid && arr[L] < min) {
+      L++;
+    }
+    while (R <= mid && arr[R] <= max) {
+      R++;
+    }
+    ans += R - L;
+  }
+  // merge sort
+  long[] help = new long[end - start + 1];
+  int i = 0;
+  int p1 = start;
+  int p2 = mid + 1;
+  while (p1 <= mid && p2 <= end) {
+    help[i++] = arr[p1] <= arr[p2] ? arr[p1++] : arr[p2++];
+  }
+  while (p1 <= mid) {
+    help[i++] = arr[p1++];
+  }
+  while (p2 <= end) {
+    help[i++] = arr[p2++];
+  }
+  for (i = 0; i < help.length; i++) {
+    arr[start + i] = help[i];
+  }
+  return ans;
 }
 ```
