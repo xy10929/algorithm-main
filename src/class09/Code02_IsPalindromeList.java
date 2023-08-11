@@ -1,4 +1,5 @@
 package class09;
+
 //lc234
 import java.util.Stack;
 
@@ -11,6 +12,55 @@ public class Code02_IsPalindromeList {
 		public Node(int data) {
 			this.value = data;
 		}
+	}
+
+	public class ListNode {
+		int val;
+		ListNode next;
+
+		ListNode() {
+		}
+
+		ListNode(int val) {
+			this.val = val;
+		}
+
+		ListNode(int val, ListNode next) {
+			this.val = val;
+			this.next = next;
+		}
+	}
+
+	public boolean isPalindrome(ListNode head) {
+		if (head.next == null) {
+			return true;
+		}
+		ListNode slow = head;
+		ListNode fast = head;
+		while (fast.next != null && fast.next.next != null) {
+			slow = slow.next;
+			fast = fast.next.next;
+		} // slow为上中点
+		fast = slow.next;// 从对称位置开始反转后半部分链表 前半部分节点个数不少于后半部分
+		slow = head;// slow指向前半部分的比较起点
+		ListNode pre = null;
+		ListNode next = null;
+		while (fast != null) {// 反转后半部分
+			next = fast.next;
+			fast.next = pre;
+			pre = fast;
+			fast = next;
+		}
+		fast = pre;// fast也指向比较的起点
+		while (fast != null) {
+			if (slow.val == fast.val) {
+				slow = slow.next;
+				fast = fast.next;
+			} else {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// need n extra space
@@ -67,8 +117,7 @@ public class Code02_IsPalindromeList {
 			n2 = n2.next.next; // n2 -> end
 		}
 		// n1 中点
-		
-		
+
 		n2 = n1.next; // n2 -> right part first node
 		n1.next = null; // mid.next -> null
 		Node n3 = null;

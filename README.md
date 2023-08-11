@@ -18,6 +18,9 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc225 用两个队列实现栈](#lc225)
 - [class05](#class05)
   - [lc327 求数组中有多少子数组累加和在目标范围内](#lc327)
+- [class09](#class09)
+  - [lc876 求链表(下)中点](#lc876)
+  - [lc234 判断链表是否回文](#lc234)
 
 ## class01
 
@@ -576,5 +579,66 @@ public void swap(int[] arr, int i, int j) {
   int tmp = arr[i];
   arr[i] = arr[j];
   arr[j] = tmp;
+}
+```
+
+## class09
+
+### lc876
+
+@求链表(下)中点  
+快慢指针
+
+```java
+public ListNode middleNode(ListNode head) {
+  if (head.next == null) {
+    return head;
+  }
+  ListNode slow = head.next;
+  ListNode fast = head.next;
+  while (fast.next != null && fast.next.next != null) {
+    slow = slow.next;
+    fast = fast.next.next;
+  }
+  return slow;
+}
+```
+
+### lc234
+
+@判断链表是否回文(O(1)空间)  
+找到链表上中点 反转其后面的部分 将两部分的节点一一进行比较
+
+```java
+public boolean isPalindrome(ListNode head) {
+  if (head.next == null) {
+    return true;
+  }
+  ListNode slow = head;
+  ListNode fast = head;
+  while (fast.next != null && fast.next.next != null) {
+    slow = slow.next;
+    fast = fast.next.next;
+  } // slow为上中点
+  fast = slow.next;// 从对称位置开始反转后半部分链表 前半部分节点个数不少于后半部分
+  slow = head;// slow指向前半部分的比较起点
+  ListNode pre = null;
+  ListNode next = null;
+  while (fast != null) {// 反转后半部分
+    next = fast.next;
+    fast.next = pre;
+    pre = fast;
+    fast = next;
+  }
+  fast = pre;// fast也指向比较的起点
+  while (fast != null) {
+    if (slow.val == fast.val) {
+      slow = slow.next;
+      fast = fast.next;
+    } else {
+      return false;
+    }
+  }
+  return true;
 }
 ```
