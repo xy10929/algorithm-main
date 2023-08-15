@@ -1,4 +1,5 @@
 package class09;
+
 //lc138
 import java.util.HashMap;
 
@@ -17,6 +18,23 @@ public class Code04_CopyListWithRandom {
 		}
 	}
 
+	public Node copyRandomList(Node head) {
+		HashMap<Node, Node> map = new HashMap<>();
+		Node cur = head;
+		while (cur != null) {
+			map.put(cur, new Node(cur.val));// 拷贝节点 并把对应的节点记录进hashmap
+			cur = cur.next;
+		}
+		cur = head;
+		while (cur != null) {
+			Node copyN = map.get(cur);
+			copyN.next = map.get(cur.next);
+			copyN.random = map.get(cur.random);
+			cur = cur.next;
+		}
+		return map.get(head);
+	}
+
 	public static Node copyRandomList1(Node head) {
 		// key 老节点
 		// value 新节点
@@ -30,7 +48,7 @@ public class Code04_CopyListWithRandom {
 		while (cur != null) {
 			// cur 老
 			// map.get(cur) 新
-			// 新.next ->  cur.next克隆节点找到
+			// 新.next -> cur.next克隆节点找到
 			map.get(cur).next = map.get(cur.next);
 			map.get(cur).random = map.get(cur.random);
 			cur = cur.next;

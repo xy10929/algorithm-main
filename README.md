@@ -21,6 +21,10 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
 - [class09](#class09)
   - [lc876 求链表(下)中点](#lc876)
   - [lc234 判断链表是否回文](#lc234)
+  - [lc138 复制有 random 指针的链表](#lc138)
+- [class10](#class10)
+  - [lc141 判断链表是否有环](#lc141)
+  - [lc142 判断链表入环节点的位置](#lc142)
 
 ## class01
 
@@ -640,5 +644,84 @@ public boolean isPalindrome(ListNode head) {
     }
   }
   return true;
+}
+```
+
+### lc138
+
+@复制有 random 指针的链表
+
+先按着原链表的 next 方向复制出 val 相同的拷贝节点 并把一一对应的节点放入 hashmap  
+然后再次沿 next 遍历 根据原链表的结构和 hashmap 记录的节点对应关系 连接复制节点的指针
+
+```java
+public Node copyRandomList(Node head) {
+  HashMap<Node, Node> map = new HashMap<>();
+  Node cur = head;
+  while (cur != null) {
+    map.put(cur, new Node(cur.val));// 拷贝节点 并把对应的节点记录进hashmap
+    cur = cur.next;
+  }
+  cur = head;
+  while (cur != null) {
+    Node copyN = map.get(cur);
+    copyN.next = map.get(cur.next);
+    copyN.random = map.get(cur.random);
+    cur = cur.next;
+  }
+  return map.get(head);
+}
+```
+
+### lc141
+
+@判断链表是否有环(O(1)空间)
+
+快慢指针最终相遇则有环 快指针到 null 则无环
+
+```java
+public boolean hasCycle(ListNode head) {
+  if (head == null || head.next == null || head.next.next == null) {// 快慢指针需要先各走一步 以确定接下来是否能相遇
+    return false;
+  }
+  ListNode slow = head.next;
+  ListNode fast = head.next.next;// 快慢指针先各走一步
+  while (slow != fast) {// 快慢指针相遇则有环
+    if (fast.next == null || fast.next.next == null) {// 快指针可达null则无环
+      return false;
+    }
+    slow = slow.next;
+    fast = fast.next.next;
+  }
+  return true;
+}
+```
+
+### lc142
+
+@判断链表入环节点的位置(O(1)空间)
+
+如果有环(快慢指针相遇) 将快指针回到原点并降速 两指针再次相遇的节点即入环节点
+
+```java
+public ListNode detectCycle(ListNode head) {
+  if (head == null || head.next == null || head.next.next == null) {
+    return null;
+  }
+  ListNode slow = head.next;
+  ListNode fast = head.next.next;
+  while (slow != fast) {
+    if (fast.next == null || fast.next.next == null) {
+      return null;
+    }
+    slow = slow.next;
+    fast = fast.next.next;
+  }
+  fast = head;// 快指针回原点
+  while (slow != fast) {// 再次相遇的节点即入环节点
+    slow = slow.next;
+    fast = fast.next;// 快指针降速
+  }
+  return slow;
 }
 ```

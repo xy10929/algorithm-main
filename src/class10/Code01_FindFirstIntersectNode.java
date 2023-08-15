@@ -1,4 +1,5 @@
 package class10;
+
 //lc141 142 160
 public class Code01_FindFirstIntersectNode {
 
@@ -9,6 +10,53 @@ public class Code01_FindFirstIntersectNode {
 		public Node(int data) {
 			this.value = data;
 		}
+	}
+
+	class ListNode {
+		int val;
+		ListNode next;
+
+		ListNode(int x) {
+			val = x;
+			next = null;
+		}
+	}
+
+	public boolean hasCycle(ListNode head) {
+		if (head == null || head.next == null || head.next.next == null) {
+			return false;
+		}
+		ListNode slow = head.next;
+		ListNode fast = head.next.next;
+		while (slow != fast) {// 快慢指针相遇则有环
+			if (fast.next == null || fast.next.next == null) {// 快指针可达null则无环
+				return false;
+			}
+			slow = slow.next;
+			fast = fast.next.next;
+		}
+		return true;
+	}
+
+	public ListNode detectCycle(ListNode head) {
+		if (head == null || head.next == null || head.next.next == null) {
+			return null;
+		}
+		ListNode slow = head.next;
+		ListNode fast = head.next.next;
+		while (slow != fast) {
+			if (fast.next == null || fast.next.next == null) {
+				return null;
+			}
+			slow = slow.next;
+			fast = fast.next.next;
+		}
+		fast = head;// 快指针回原点
+		while (slow != fast) {// 再次相遇的节点即入环节点
+			slow = slow.next;
+			fast = fast.next;// 快指针降速
+		}
+		return slow;
 	}
 
 	public static Node getIntersectNode(Node head1, Node head2) {
@@ -31,7 +79,7 @@ public class Code01_FindFirstIntersectNode {
 		if (head == null || head.next == null || head.next.next == null) {
 			return null;
 		}
-		// n1 慢  n2 快
+		// n1 慢 n2 快
 		Node slow = head.next; // n1 -> slow
 		Node fast = head.next.next; // n2 -> fast
 		while (slow != fast) {
@@ -41,7 +89,7 @@ public class Code01_FindFirstIntersectNode {
 			fast = fast.next.next;
 			slow = slow.next;
 		}
-		// slow fast  相遇
+		// slow fast 相遇
 		fast = head; // n2 -> walk again from head
 		while (slow != fast) {
 			slow = slow.next;
@@ -69,7 +117,7 @@ public class Code01_FindFirstIntersectNode {
 		if (cur1 != cur2) {
 			return null;
 		}
-		// n  :  链表1长度减去链表2长度的值
+		// n : 链表1长度减去链表2长度的值
 		cur1 = n > 0 ? head1 : head2; // 谁长，谁的头变成cur1
 		cur2 = cur1 == head1 ? head2 : head1; // 谁短，谁的头变成cur2
 		n = Math.abs(n);
