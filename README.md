@@ -25,6 +25,10 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
 - [class10](#class10)
   - [lc141 判断链表是否有环](#lc141)
   - [lc142 判断链表入环节点的位置](#lc142)
+  - [lc160 判断两个无环链表是否相交 是则返回相交节点](#lc160)
+  - [lc144 二叉树的先序遍历](#lc144)
+  - [lc94 二叉树的中序遍历](#lc94)
+  - [lc145 二叉树的后序遍历](#lc145)
 
 ## class01
 
@@ -723,5 +727,97 @@ public ListNode detectCycle(ListNode head) {
     fast = fast.next;// 快指针降速
   }
   return slow;
+}
+```
+
+### lc160
+
+@判断两个无环链表是否相交 是则返回相交节点
+
+遍历两链表到各自结尾并记录长度 若两节点不同则不想交  
+把长链表先前进相差的长度 再令两链表同时直至节点相同
+
+```java
+public ListNode getIntersectionNode(ListNode head1, ListNode head2) {
+  ListNode cur1 = head1;
+  ListNode cur2 = head2;
+  int n = 0;
+  while (cur1.next != null) {// 找到末尾节点
+    cur1 = cur1.next;
+    n++;
+  }
+  while (cur2.next != null) {
+    cur2 = cur2.next;
+    n--;
+  }
+  if (cur1 != cur2) {// 末尾不同则必不相交
+    return null;
+  }
+  cur1 = n < 0 ? head1 : head2;
+  cur2 = cur1 == head1 ? head2 : head1;
+  n = Math.abs(n);
+  while (n != 0) {// 长链表前进相差的长度
+    cur2 = cur2.next;
+    n--;
+  }
+  while (cur1 != cur2) {// 同时前进直至相交
+    cur1 = cur1.next;
+    cur2 = cur2.next;
+  }
+  return cur1;
+}
+```
+
+### lc144
+
+@二叉树的先序遍历
+
+```java
+List<Integer> ans = new ArrayList<>();
+
+public List<Integer> preorderTraversal(TreeNode root) {
+  if (root == null) {
+    return ans;
+  }
+  ans.add(root.val);
+  preorderTraversal(root.left);
+  preorderTraversal(root.right);
+  return ans;
+}
+```
+
+### lc94
+
+@二叉树的中序遍历
+
+```java
+List<Integer> ans = new ArrayList<>();
+
+public List<Integer> inorderTraversal(TreeNode root) {
+  if (root == null) {
+    return ans;
+  }
+  inorderTraversal(root.left);
+  ans.add(root.val);
+  inorderTraversal(root.right);
+  return ans;
+}
+```
+
+### lc145
+
+@二叉树的后序遍历
+
+```java
+List<Integer> ans = new ArrayList<>();
+
+public List<Integer> postorderTraversal(TreeNode root) {
+  if (root == null) {
+    return ans;
+  }
+  postorderTraversal(root.left);
+  postorderTraversal(root.right);
+  ans.add(root.val);
+  return ans;
 }
 ```

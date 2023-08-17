@@ -23,11 +23,11 @@ public class Code01_FindFirstIntersectNode {
 	}
 
 	public boolean hasCycle(ListNode head) {
-		if (head == null || head.next == null || head.next.next == null) {
+		if (head == null || head.next == null || head.next.next == null) {// 快慢指针需要先各走一步 以确定接下来是否能相遇
 			return false;
 		}
 		ListNode slow = head.next;
-		ListNode fast = head.next.next;
+		ListNode fast = head.next.next;// 快慢指针先各走一步
 		while (slow != fast) {// 快慢指针相遇则有环
 			if (fast.next == null || fast.next.next == null) {// 快指针可达null则无环
 				return false;
@@ -57,6 +57,35 @@ public class Code01_FindFirstIntersectNode {
 			fast = fast.next;// 快指针降速
 		}
 		return slow;
+	}
+
+	public ListNode getIntersectionNode(ListNode head1, ListNode head2) {
+		ListNode cur1 = head1;
+		ListNode cur2 = head2;
+		int n = 0;
+		while (cur1.next != null) {// 找到末尾节点
+			cur1 = cur1.next;
+			n++;
+		}
+		while (cur2.next != null) {
+			cur2 = cur2.next;
+			n--;
+		}
+		if (cur1 != cur2) {// 末尾不同则必不相交
+			return null;
+		}
+		cur1 = n < 0 ? head1 : head2;
+		cur2 = cur1 == head1 ? head2 : head1;
+		n = Math.abs(n);
+		while (n != 0) {// 长链表前进相差的长度
+			cur2 = cur2.next;
+			n--;
+		}
+		while (cur1 != cur2) {// 同时前进直至相交
+			cur1 = cur1.next;
+			cur2 = cur2.next;
+		}
+		return cur1;
 	}
 
 	public static Node getIntersectNode(Node head1, Node head2) {
