@@ -1,9 +1,56 @@
 package class11;
+
+import java.util.ArrayList;
 //lc102
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class Code01_LevelTraversalBT {
+
+	public class TreeNode {
+		int val;
+		TreeNode left;
+		TreeNode right;
+
+		TreeNode() {
+		}
+
+		TreeNode(int val) {
+			this.val = val;
+		}
+
+		TreeNode(int val, TreeNode left, TreeNode right) {
+			this.val = val;
+			this.left = left;
+			this.right = right;
+		}
+	}
+
+	public List<List<Integer>> levelOrder(TreeNode root) {
+		List<List<Integer>> ans = new ArrayList<>();
+		if (root == null) {
+			return ans;
+		}
+		Queue<TreeNode> q = new LinkedList<>();
+		q.add(root);
+		while (!q.isEmpty()) {
+			int size = q.size();// 队列当前的size
+			List<Integer> curLevel = new ArrayList<>();// 当前层
+			for (int i = 0; i < size; i++) {// 重复size次
+				TreeNode cur = q.poll();
+				curLevel.add(cur.val);
+				if (cur.left != null) {
+					q.add(cur.left);
+				}
+				if (cur.right != null) {
+					q.add(cur.right);
+				}
+			}
+			ans.add(curLevel);
+		}
+		return ans;
+	}
 
 	public static class Node {
 		public int value;

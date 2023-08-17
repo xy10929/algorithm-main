@@ -29,6 +29,10 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc144 二叉树的先序遍历](#lc144)
   - [lc94 二叉树的中序遍历](#lc94)
   - [lc145 二叉树的后序遍历](#lc145)
+- [class11](#class11)
+  - [lc102 二叉树层序遍历](#lc102)
+- [class12](#class12)
+  - [lc958 判断是否为完全二叉树](#lc958)
 
 ## class01
 
@@ -819,5 +823,101 @@ public List<Integer> postorderTraversal(TreeNode root) {
   postorderTraversal(root.right);
   ans.add(root.val);
   return ans;
+}
+```
+
+## class11
+
+### lc102
+
+@二叉树层序遍历
+
+准备一个队列 用于存放节点 先放入头结点  
+while 队列不为空  
+记录队列 size 生成存放当前层的 list  
+进行 size 次如下操作:  
+(节点出队列 放入其 val 放入当前层 list  
+有左把左加入队列 有右把右加入队列)  
+当前层 list 加入结果
+
+```java
+public List<List<Integer>> levelOrder(TreeNode root) {
+  List<List<Integer>> ans = new ArrayList<>();
+  if (root == null) {
+    return ans;
+  }
+  Queue<TreeNode> q = new LinkedList<>();
+  q.add(root);
+  while (!q.isEmpty()) {
+    int size = q.size();// 队列当前的size
+    List<Integer> curLevel = new ArrayList<>();// 当前层
+    for (int i = 0; i < size; i++) {// 重复size次
+      TreeNode cur = q.poll();
+      curLevel.add(cur.val);
+      if (cur.left != null) {
+        q.add(cur.left);
+      }
+      if (cur.right != null) {
+        q.add(cur.right);
+      }
+    }
+    ans.add(curLevel);
+  }
+  return ans;
+}
+```
+
+## class12
+
+### lc958
+
+@判断是否为完全二叉树
+
+根据完全二叉树的几种形态 确定 info 包含是否满 是否完全 高度  
+先确认是否满 即左右都满且高度相同  
+如果不是 先把是否完全设为 false, 满足以下任一形态则改为 true  
+① 左满右完全 高度相同  
+② 左满右满 左比右高 1  
+③ 左完全右满 左比右高 1
+
+```java
+public boolean isCompleteTree(TreeNode root) {
+  return process(root).isComplete;
+}
+
+public class info {
+  public boolean isFull;
+  public boolean isComplete;
+  public int height;
+
+  public info(boolean isFull, boolean isComplete, int height) {
+    this.isFull = isFull;
+    this.isComplete = isComplete;
+    this.height = height;
+  }
+}
+
+public info process(TreeNode root) {
+  if (root == null) {
+    return new info(true, true, 0);
+  }
+  info leftInfo = process(root.left);
+  info rightInfo = process(root.right);
+  int height = Math.max(leftInfo.height, rightInfo.height) + 1;
+  boolean isFull = leftInfo.isFull && rightInfo.isFull && leftInfo.height == rightInfo.height;
+  if (isFull) {
+    return new info(true, true, height);
+  }
+  boolean isComplete = false;
+  if (leftInfo.isFull && rightInfo.isComplete && leftInfo.height == rightInfo.height) {// 左满右完全 高度相同
+    isComplete = true;
+  }
+  if (leftInfo.isFull && rightInfo.isFull && leftInfo.height == rightInfo.height + 1) {// 左满右满 左比右高1
+    isComplete = true;
+  }
+  if (leftInfo.isComplete && rightInfo.isFull && leftInfo.height == rightInfo.height + 1) {// 左完全右满 左比右高1
+    isComplete = true;
+  }
+  return new info(false, isComplete, height);
 }
 ```
