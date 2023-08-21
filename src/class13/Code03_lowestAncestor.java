@@ -1,10 +1,58 @@
 package class13;
+
 //lc236
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class Code03_lowestAncestor {
+
+	public class TreeNode {
+		int val;
+		TreeNode left;
+		TreeNode right;
+
+		TreeNode(int x) {
+			val = x;
+		}
+	}
+
+	public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+		return process(root, p, q).ans;
+	}
+
+	public class info {
+		public boolean findA;
+		public boolean findB;
+		TreeNode ans;
+
+		public info(boolean findA, boolean findB, TreeNode ans) {
+			this.findA = findA;
+			this.findB = findB;
+			this.ans = ans;
+		}
+	}
+
+	public info process(TreeNode n, TreeNode a, TreeNode b) {
+		if (n == null) {
+			return new info(false, false, null);
+		}
+		info leftInfo = process(n.left, a, b);
+		info rightInfo = process(n.right, a, b);
+		boolean findA = (n == a) || leftInfo.findA || rightInfo.findA;
+		boolean findB = (n == b) || leftInfo.findB || rightInfo.findB;
+		TreeNode ans = null;
+		if (leftInfo.ans != null) {// LCA在入参节点为头的左/右树中
+			ans = leftInfo.ans;
+		} else if (rightInfo.ans != null) {
+			ans = rightInfo.ans;
+		} else {// 入参节点即LCA
+			if (findA && findB) {
+				ans = n;
+			}
+		}
+		return new info(findA, findB, ans);
+	}
 
 	public static class Node {
 		public int value;

@@ -33,7 +33,10 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc102 二叉树层序遍历](#lc102)
 - [class12](#class12)
   - [lc958 判断是否为完全二叉树](#lc958)
-  - [lc333 求二叉树的最大搜索二叉树子树的节点个数](#lc958)
+  - [lc333 求二叉树的最大搜索二叉树子树的节点个数](#lc333)
+  - [lc543 求二叉树节点间的最大距离](#lc543)
+- [class13](#class13)
+  - [lc236 寻找二叉树中两节点的最低公共祖先](#lc236)
 
 ## class01
 
@@ -929,7 +932,8 @@ public info process(TreeNode root) {
 
 ① 入参节点不是子树的头结点 则需要分别求其左右树的最大搜索子树的 size  
 ② 入参节点为头的树即搜索二叉树 则需要左右树都是 bst, 左最大<val<右最小, 左右树的 size  
-综上可知 info 需要包含最大搜索子树的 size,min 和 max,树的 size
+综上可知, info 需要包含最大搜索子树的 size,min 和 max,树的 size  
+(比较 size 和 BSTSub 可知是否为 BST)
 
 ```java
 public int largestBSTSubtree(TreeNode root) {
@@ -984,5 +988,99 @@ public info process(TreeNode root) {
   }
   int BSTSub = Math.max(n3, Math.max(n1, n2));
   return new info(BSTSub, min, max, size);
+}
+```
+
+### lc543
+
+@求二叉树节点间的最大距离  
+① 最大距离和入参节点无关 则需要左右树的最大距离  
+② 最大距离和入参节点有关 即需要左右树的高度相加  
+因此 info 需要最大距离和高度
+
+```java
+public int diameterOfBinaryTree(TreeNode root) {
+  return process(root).max;
+}
+
+public class info {
+  int max;
+  int height;
+
+  public info(int max, int height) {
+    this.max = max;
+    this.height = height;
+  }
+}
+
+public info process(TreeNode root) {
+  if (root == null) {
+    return new info(0, 0);
+  }
+  info leftInfo = process(root.left);
+  info rightInfo = process(root.right);
+  int height = Math.max(leftInfo.height, rightInfo.height) + 1;
+  int max = leftInfo.height + rightInfo.height;// 经过root
+  max = Math.max(max, Math.max(leftInfo.max, rightInfo.max));// 和root无关
+  return new info(max, height);
+}
+```
+
+## class13
+
+### lc236
+
+@寻找二叉树中两节点的最低公共祖先
+
+入参节点是否为最低公共祖先 LCA
+
+不是  
+①LCA 在入参节点的子树上  
+② 入参节点为头的子树中不能找全 a 和 b
+
+是  
+❶ 入参节点左右树各有一个 在入参节点汇聚  
+❷ 入参节点即是其中一个节点 子树中有另一个节点
+
+所以 info 包含  
+LCA(在入参节点为头的树中不存在则为 null)  
+节点 a 和 b 是否存在
+
+```java
+public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+  return process(root, p, q).ans;
+}
+
+public class info {
+  public boolean findA;
+  public boolean findB;
+  TreeNode ans;
+
+  public info(boolean findA, boolean findB, TreeNode ans) {
+    this.findA = findA;
+    this.findB = findB;
+    this.ans = ans;
+  }
+}
+
+public info process(TreeNode n, TreeNode a, TreeNode b) {
+  if (n == null) {
+    return new info(false, false, null);
+  }
+  info leftInfo = process(n.left, a, b);
+  info rightInfo = process(n.right, a, b);
+  boolean findA = (n == a) || leftInfo.findA || rightInfo.findA;
+  boolean findB = (n == b) || leftInfo.findB || rightInfo.findB;
+  TreeNode ans = null;
+  if (leftInfo.ans != null) {// LCA在入参节点为头的左/右树中
+    ans = leftInfo.ans;
+  } else if (rightInfo.ans != null) {
+    ans = rightInfo.ans;
+  } else {// 入参节点即LCA
+    if (findA && findB) {
+      ans = n;
+    }
+  }
+  return new info(findA, findB, ans);
 }
 ```

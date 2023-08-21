@@ -1,10 +1,56 @@
 package class12;
+
 //lc543
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class Code06_MaxDistance {
+
+	public class TreeNode {
+		int val;
+		TreeNode left;
+		TreeNode right;
+
+		TreeNode() {
+		}
+
+		TreeNode(int val) {
+			this.val = val;
+		}
+
+		TreeNode(int val, TreeNode left, TreeNode right) {
+			this.val = val;
+			this.left = left;
+			this.right = right;
+		}
+	}
+
+	public int diameterOfBinaryTree(TreeNode root) {
+		return process(root).max;
+	}
+
+	public class info {
+		int max;
+		int height;
+
+		public info(int max, int height) {
+			this.max = max;
+			this.height = height;
+		}
+	}
+
+	public info process(TreeNode root) {
+		if (root == null) {
+			return new info(0, 0);
+		}
+		info leftInfo = process(root.left);
+		info rightInfo = process(root.right);
+		int height = Math.max(leftInfo.height, rightInfo.height) + 1;
+		int max = leftInfo.height + rightInfo.height;// 经过root
+		max = Math.max(max, Math.max(leftInfo.max, rightInfo.max));// 和root无关
+		return new info(max, height);
+	}
 
 	public static class Node {
 		public int value;
