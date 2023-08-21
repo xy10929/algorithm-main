@@ -33,6 +33,7 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc102 二叉树层序遍历](#lc102)
 - [class12](#class12)
   - [lc958 判断是否为完全二叉树](#lc958)
+  - [lc333 求二叉树的最大搜索二叉树子树的节点个数](#lc958)
 
 ## class01
 
@@ -919,5 +920,69 @@ public info process(TreeNode root) {
     isComplete = true;
   }
   return new info(false, isComplete, height);
+}
+```
+
+### lc333
+
+@求二叉树的最大搜索二叉树子树的节点个数
+
+① 入参节点不是子树的头结点 则需要分别求其左右树的最大搜索子树的 size  
+② 入参节点为头的树即搜索二叉树 则需要左右树都是 bst, 左最大<val<右最小, 左右树的 size  
+综上可知 info 需要包含最大搜索子树的 size,min 和 max,树的 size
+
+```java
+public int largestBSTSubtree(TreeNode root) {
+  if (root == null) {
+    return 0;
+  }
+  return process(root).BSTSub;
+}
+
+public class info {
+  public int BSTSub;// 最大搜索子树的size
+  public int min;
+  public int max;
+  public int size;
+
+  public info(int BSTSub, int min, int max, int size) {
+    this.BSTSub = BSTSub;
+    this.min = min;
+    this.max = max;
+    this.size = size;
+  }
+}
+
+public info process(TreeNode root) {
+  if (root == null) {
+    return null;
+  }
+  info leftInfo = process(root.left);
+  info rightInfo = process(root.right);
+  int n1 = -1;
+  int n2 = -1;// 左树和右树的最大搜索子树的 size
+  int n3 = 1;// root为头的树是BST,则BSTSub为整棵树的size
+  int min = root.val;
+  int max = root.val;
+  int size = 1;
+  if (leftInfo != null) {
+    n1 = leftInfo.BSTSub;
+    max = Math.max(max, leftInfo.max);
+    min = Math.min(min, leftInfo.min);
+    size += leftInfo.size;
+  }
+  if (rightInfo != null) {
+    n2 = rightInfo.BSTSub;
+    max = Math.max(max, rightInfo.max);
+    min = Math.min(min, rightInfo.min);
+    size += rightInfo.size;
+  }
+  //整棵树为BST的条件: 左右树均为BST且左max < root.val < 右min
+  if ((leftInfo == null || (leftInfo.BSTSub == leftInfo.size && leftInfo.max < root.val))
+      && (rightInfo == null || (rightInfo.BSTSub == rightInfo.size && rightInfo.min > root.val))) {
+    n3 = size;
+  }
+  int BSTSub = Math.max(n3, Math.max(n1, n2));
+  return new info(BSTSub, min, max, size);
 }
 ```
