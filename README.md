@@ -37,6 +37,10 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc543 求二叉树节点间的最大距离](#lc543)
 - [class13](#class13)
   - [lc236 寻找二叉树中两节点的最低公共祖先](#lc236)
+- [class14](#class14)
+  - [lc502 一些项目有各自的成本和利润 求 w 本金做最多 k 个项目后的最大资本](#lc502)
+- [class15](#class15)
+  - [lc547 二维数组记录对应的两地是否连通 求连通区总数](#lc547)
 
 ## class01
 
@@ -1084,3 +1088,64 @@ public info process(TreeNode n, TreeNode a, TreeNode b) {
   return new info(findA, findB, ans);
 }
 ```
+
+## class14
+
+### lc502
+
+@两个数组记录一些项目各自的成本和利润 求 w 本金做最多 k 个项目后的最大资本
+
+把项目全部放入按花费的小跟堆 再准备按利润的大根堆  
+每次把当前能做的项目从小跟堆弹出 放入大根堆 做大根堆顶的项目 然后根据其利润更新资金
+
+```java
+public int findMaximizedCapital(int k, int w, int[] profits, int[] capital) {
+  PriorityQueue<Program> minCost = new PriorityQueue<>(new minCostComparator());// cost小跟堆
+  PriorityQueue<Program> maxProfit = new PriorityQueue<>(new maxProfitComparator());// profit大根堆
+  for (int i = 0; i < profits.length; i++) {// 所有项目先放进小跟堆
+    minCost.add(new Program(capital[i], profits[i]));
+  }
+  for (int i = 0; i < k; i++) {// 最多做k个项目
+    while (!minCost.isEmpty() && minCost.peek().cost <= w) {// 把当前能做的所有项目放进profit大根堆
+      maxProfit.add(minCost.poll());
+    }
+    if (maxProfit.isEmpty()) {// 还未做够k个项目就已经不能做了
+      return w;
+    }
+    w += maxProfit.poll().profit;// 更新资金w
+  }
+  return w;
+}
+
+public class Program {
+  public int cost;
+  public int profit;
+
+  public Program(int cost, int profit) {
+    this.cost = cost;
+    this.profit = profit;
+  }
+}
+
+public class minCostComparator implements Comparator<Program> {
+
+  @Override
+  public int compare(Program o1, Program o2) {
+    return o1.cost - o2.cost;
+  }
+}
+
+public class maxProfitComparator implements Comparator<Program> {
+
+  @Override
+  public int compare(Program o1, Program o2) {
+    return o2.profit - o1.profit;
+  }
+}
+```
+
+## class15
+
+### lc547
+
+@二维数组记录对应的两地是否连通 求连通区总数
