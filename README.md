@@ -39,8 +39,10 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc236 寻找二叉树中两节点的最低公共祖先](#lc236)
 - [class14](#class14)
   - [lc502 一些项目有各自的成本和利润 求 w 本金做最多 k 个项目后的最大资本](#lc502)
-- [class15](#class15)
-  - [lc547 二维数组记录对应的两地是否连通 求连通区总数](#lc547)
+- [class15 并查集](#class15)
+- [class17](#class17)
+  - [lc78 返回一个数字数组的全部子序列(可以不连续)](#lc78)
+  - [lc46 返回一个数字数组的所有全排列结果](#lc46)
 
 ## class01
 
@@ -1146,6 +1148,79 @@ public class maxProfitComparator implements Comparator<Program> {
 
 ## class15
 
-### lc547
+### 并查集
 
-@二维数组记录对应的两地是否连通 求连通区总数
+## class17
+
+### lc78
+
+@返回一个数字数组的全部子序列(可以不连续)
+即对于每个位置可以要/不要做出全部可能的决定
+
+用递归函数求解 参数包括{  
+表示字符串的数组(固定不变)  
+做决定到达的位置 i  
+path 记录之前的路径  
+ans 收集所有路径  
+}
+
+```java
+public List<List<Integer>> subsets(int[] arr) {
+  List<List<Integer>> ans = new ArrayList<>();
+  List<Integer> path = new ArrayList<>();
+  process(arr, 0, path, ans);
+  return ans;
+}
+
+public void process(int[] arr, int i, List<Integer> path, List<List<Integer>> ans) {
+  if (i == arr.length) {// 已对所有位置要/不要做出了决定 收集该种情况的结果
+    ans.add(new ArrayList<>(path));// path按引用传递 所以需要生成相同的path加入结果
+    return;
+  }
+  process(arr, i + 1, path, ans);// 不要当前位置
+  // 按照深度优先 最先返回全不要的结果 然后从后向前地对每个位置做要/不要的决定
+  path.add(arr[i]);
+  process(arr, i + 1, path, ans);// 要当前位置
+  path.remove(path.size() - 1);// 即将返回上游(前面某个位置)做(要的)决定 作为该位置后面的位置 应恢复成最初不要的状态
+}
+```
+
+### lc46
+
+@返回一个数字数组的所有全排列结果
+
+把所有数字收集进 rest  
+可能的组合放进 path  
+所有 path 收集进 ans
+
+尝试从 rest 每个位置取数字放进 path 开头 剩余的部分递归调用函数  
+rest 为空时形成 path, 将其存入 ans
+
+```java
+public List<List<Integer>> permute(int[] arr) {
+  List<List<Integer>> ans = new ArrayList<>();
+  List<Integer> path = new ArrayList<>();
+  List<Integer> rest = new ArrayList<>();// 剩余可用的数字
+  for (int i = 0; i < arr.length; i++) {
+    rest.add(arr[i]);
+  }
+  process(ans, path, rest);
+  return ans;
+}
+
+public void process(List<List<Integer>> ans, List<Integer> path, List<Integer> rest) {
+  if (rest.isEmpty()) {// 所有数字都已加入path
+    ans.add(new ArrayList<>(path));
+    return;
+  }
+  int n = rest.size();
+  for (int i = 0; i < n; i++) {// 所有数字都可能作为开头
+    int cur = rest.get(i);
+    path.add(cur);
+    rest.remove(i);
+    process(ans, path, rest);
+    path.remove(path.size() - 1);// 恢复现场
+    rest.add(i, cur);
+  }
+}
+```

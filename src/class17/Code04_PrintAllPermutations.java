@@ -1,9 +1,37 @@
 package class17;
+
 //lc46
 import java.util.ArrayList;
 import java.util.List;
 
 public class Code04_PrintAllPermutations {
+
+	public List<List<Integer>> permute(int[] arr) {
+		List<List<Integer>> ans = new ArrayList<>();
+		List<Integer> path = new ArrayList<>();
+		List<Integer> rest = new ArrayList<>();// 剩余可用的数字
+		for (int i = 0; i < arr.length; i++) {
+			rest.add(arr[i]);
+		}
+		process(ans, path, rest);
+		return ans;
+	}
+
+	public void process(List<List<Integer>> ans, List<Integer> path, List<Integer> rest) {
+		if (rest.isEmpty()) {// 所有数字都已加入path
+			ans.add(new ArrayList<>(path));
+			return;
+		}
+		int n = rest.size();
+		for (int i = 0; i < n; i++) {// 所有数字都可能作为开头
+			int cur = rest.get(i);
+			path.add(cur);
+			rest.remove(i);
+			process(ans, path, rest);
+			path.remove(path.size() - 1);// 恢复现场
+			rest.add(i, cur);
+		}
+	}
 
 	public static List<String> permutation1(String s) {
 		List<String> ans = new ArrayList<>();

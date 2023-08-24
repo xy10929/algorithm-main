@@ -1,10 +1,30 @@
 package class17;
+
 //lc78
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 public class Code03_PrintAllSubsquences {
+
+	public List<List<Integer>> subsets(int[] arr) {
+		List<List<Integer>> ans = new ArrayList<>();
+		List<Integer> path = new ArrayList<>();
+		process(arr, 0, path, ans);
+		return ans;
+	}
+
+	public void process(int[] arr, int i, List<Integer> path, List<List<Integer>> ans) {
+		if (i == arr.length) {// 已对所有位置要、不要做出了决定 收集该种情况的结果
+			ans.add(new ArrayList<>(path));// 生成相同的path加入结果
+			return;
+		}
+		process(arr, i + 1, path, ans);// 不要当前位置
+		// 按照深度优先 最先返回全不要的结果 然后从后向前地对每个位置做要/不要的决定
+		path.add(arr[i]);
+		process(arr, i + 1, path, ans);// 要当前位置
+		path.remove(path.size() - 1);// 即将返回上游(前面某个位置)做(要的)决定 作为该位置后面的位置 应恢复成最初不要的状态
+	}
 
 	// s -> "abc" ->
 	public static List<String> subs(String s) {
