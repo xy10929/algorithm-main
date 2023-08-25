@@ -43,6 +43,8 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
 - [class17](#class17)
   - [lc78 返回一个数字数组的全部子序列(可以不连续)](#lc78)
   - [lc46 返回一个数字数组的所有全排列结果](#lc46)
+- [class18](#class18)
+  - [lc486 数组表示一些牌 两人依次从最左或最右拿并获取对应分数 预测胜者](#lc486)
 
 ## class01
 
@@ -1222,5 +1224,100 @@ public void process(List<List<Integer>> ans, List<Integer> path, List<Integer> r
     path.remove(path.size() - 1);// 恢复现场
     rest.add(i, cur);
   }
+}
+```
+
+## class18
+
+尝试模型  
+① 从左往右(每个位置要/不要)  
+② 范围(开头和结尾)  
+③ 样本对应(结尾)
+
+找到影响返回值的全部参数(实参组合会重复调用)
+
+记忆化搜索(无枚举行为做到此步即可)  
+1.根据可变参数范围建立缓存表 先为每个位置设置不合理返回值  
+2.递归函数先判断缓存表中的值是否合理 是则直接返回  
+3.先用 ans 记录每一种情况的返回值 返回 ans 前先将其记录在缓存表中
+
+### lc486
+
+@数组表示一些牌 两人依次从最左或最右拿并获取对应分数 预测胜者
+
+1.暴力递归
+
+```java
+public boolean predictTheWinner(int[] arr) {
+  int first = f(arr, 0, arr.length - 1);
+  int second = s(arr, 0, arr.length - 1);
+  return first >= second;
+}
+
+public int f(int[] arr, int L, int R) {// 先手
+  if (L == R) {
+    return arr[L];
+  }
+  int left = arr[L] + s(arr, L + 1, R);// 自己先手选左 则后续等价于自己在L+1到R后手
+  int right = arr[R] + s(arr, L, R - 1);
+  return Math.max(left, right);
+}
+
+public int s(int[] arr, int L, int R) {// 后手
+  if (L == R) {
+    return 0;
+  }
+  int left = f(arr, L + 1, R);// 对手先手选左 等价于自己在L+1到R先手
+  int right = f(arr, L, R - 1);// 对手先手选右 等价于自己在L到R-1后手
+  return Math.min(left, right);// 零和博弈 对手先手选max的情况 自己后手剩min的情况
+}
+```
+
+2.记忆化搜索
+
+```java
+public boolean predictTheWinner(int[] arr) {
+  int n = arr.length;
+  int[][] fMap = new int[n][n];// L和R的范围均为0到n-1
+  int[][] sMap = new int[n][n];
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      fMap[i][j] = -1;
+      sMap[i][j] = -1;
+    }
+  }
+  int first = f(arr, 0, arr.length - 1, fMap, sMap);
+  int second = s(arr, 0, arr.length - 1, fMap, sMap);
+  return first >= second;
+}
+
+public int f(int[] arr, int L, int R, int[][] fMap, int[][] sMap) {
+  if (fMap[L][R] != -1) {
+    return fMap[L][R];
+  }
+  int ans = 0;
+  if (L == R) {
+    ans = arr[L];
+  } else {
+    int left = arr[L] + s(arr, L + 1, R, fMap, sMap);
+    int right = arr[R] + s(arr, L, R - 1, fMap, sMap);
+    ans = Math.max(left, right);
+  }
+  fMap[L][R] = ans;
+  return ans;
+}
+
+public int s(int[] arr, int L, int R, int[][] fMap, int[][] sMap) {
+  if (sMap[L][R] != -1) {
+    return sMap[L][R];
+  }
+  int ans = 0;
+  if (L != R) {
+    int left = f(arr, L + 1, R, fMap, sMap);
+    int right = f(arr, L, R - 1, fMap, sMap);
+    ans = Math.min(left, right);
+  }
+  sMap[L][R] = ans;
+  return ans;
 }
 ```

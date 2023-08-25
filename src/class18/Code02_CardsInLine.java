@@ -1,6 +1,76 @@
 package class18;
+
 //lc486
 public class Code02_CardsInLine {
+
+//	public boolean predictTheWinner(int[] arr) {
+//		int first = f(arr, 0, arr.length - 1);
+//		int second = s(arr, 0, arr.length - 1);
+//		return first >= second;
+//	}
+//
+//	public int f(int[] arr, int L, int R) {// 先手
+//		if (L == R) {
+//			return arr[L];
+//		}
+//		int left = arr[L] + s(arr, L + 1, R);// 自己先手选左 则后续等价于自己在L+1到R后手
+//		int right = arr[R] + s(arr, L, R - 1);
+//		return Math.max(left, right);
+//	}
+//
+//	public int s(int[] arr, int L, int R) {// 后手
+//		if (L == R) {
+//			return 0;
+//		}
+//		int left = f(arr, L + 1, R);// 对手先手选左 等价于自己在L+1到R先手
+//		int right = f(arr, L, R - 1);// 对手先手选右 等价于自己在L到R-1后手
+//		return Math.min(left, right);
+//	}
+
+	public boolean predictTheWinner(int[] arr) {
+		int n = arr.length;
+		int[][] fMap = new int[n][n];// L和R的范围均为0到n-1
+		int[][] sMap = new int[n][n];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				fMap[i][j] = -1;
+				sMap[i][j] = -1;
+			}
+		}
+		int first = f(arr, 0, arr.length - 1, fMap, sMap);
+		int second = s(arr, 0, arr.length - 1, fMap, sMap);
+		return first >= second;
+	}
+
+	public int f(int[] arr, int L, int R, int[][] fMap, int[][] sMap) {
+		if (fMap[L][R] != -1) {
+			return fMap[L][R];
+		}
+		int ans = 0;
+		if (L == R) {
+			ans = arr[L];
+		} else {
+			int left = arr[L] + s(arr, L + 1, R, fMap, sMap);
+			int right = arr[R] + s(arr, L, R - 1, fMap, sMap);
+			ans = Math.max(left, right);
+		}
+		fMap[L][R] = ans;
+		return ans;
+	}
+
+	public int s(int[] arr, int L, int R, int[][] fMap, int[][] sMap) {
+		if (sMap[L][R] != -1) {
+			return sMap[L][R];
+		}
+		int ans = 0;
+		if (L != R) {
+			int left = f(arr, L + 1, R, fMap, sMap);
+			int right = f(arr, L, R - 1, fMap, sMap);
+			ans = Math.min(left, right);
+		}
+		sMap[L][R] = ans;
+		return ans;
+	}
 
 	// 根据规则，返回获胜者的分数
 	public static int win1(int[] arr) {
