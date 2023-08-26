@@ -45,6 +45,10 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc46 返回一个数字数组的所有全排列结果](#lc46)
 - [class18](#class18)
   - [lc486 数组表示一些牌 两人依次从最左或最右拿并获取对应分数 预测胜者](#lc486)
+- [class19](#class19)
+  - [lc91 字符串中 1 至 26 可解码为 a 到 z, 求可能的解码结果数](#lc91)
+- [class20](#class20)
+  - [lc516 求字符串最长回文子序列长度](#lc516)
 
 ## class01
 
@@ -1229,17 +1233,36 @@ public void process(List<List<Integer>> ans, List<Integer> path, List<Integer> r
 
 ## class18
 
+<font color=red>
+暴力递归
+
 尝试模型  
 ① 从左往右(每个位置要/不要)  
 ② 范围(开头和结尾)  
 ③ 样本对应(结尾)
 
+</font>
 找到影响返回值的全部参数(实参组合会重复调用)
+
+<font color=orange>
 
 记忆化搜索(无枚举行为做到此步即可)  
 1.根据可变参数范围建立缓存表 先为每个位置设置不合理返回值  
 2.递归函数先判断缓存表中的值是否合理 是则直接返回  
 3.先用 ans 记录每一种情况的返回值 返回 ans 前先将其记录在缓存表中
+
+</font>
+
+<font color=yellow>
+
+严格表结构  
+依据递归过程  
+1.根据可变参数范围建立缓存表  
+2.确定返回值在表中的位置  
+3.确定 base case 在表中的位置和值  
+4.由递归子过程确定普遍位置的依赖关系并填表
+
+</font>
 
 ### lc486
 
@@ -1319,5 +1342,117 @@ public int s(int[] arr, int L, int R, int[][] fMap, int[][] sMap) {
   }
   sMap[L][R] = ans;
   return ans;
+}
+```
+
+## class19
+
+### lc91
+
+@字符串中 1 至 26 可解码为 a 到 z, 求可能的解码结果数
+
+暴力递归
+
+```java
+public int numDecodings(String s) {
+  char[] str = s.toCharArray();
+  return process(str, 0);
+}
+
+public int process(char[] str, int i) {
+  if (i == str.length) {// 到达字符串末尾 转换有效
+    return 1;
+  }
+  if (str[i] == '0') {// 0开头的字符串无法转化 转换无效
+    return 0;
+  }
+  int ans = process(str, i + 1);// 当前字符单独转换
+  if (i + 1 < str.length && ((str[i] - '0') * 10 + str[i + 1] - '0' < 27)) {// 当前字符和下一个字符可以一起转换
+    ans += process(str, i + 2);
+  }
+  return ans;
+}
+```
+
+动态规划
+
+```java
+public int numDecodings(String s) {
+  char[] str = s.toCharArray();
+  int n = str.length;
+  int[] dp = new int[n + 1];// i范围为0到n
+  dp[n] = 1;// base case
+  for (int i = n - 1; i >= 0; i--) {// 普遍位置依赖于右边两个位置
+    // str[i]为0时dp[i]填0
+    if (str[i] != '0') {
+      dp[i] = dp[i + 1];
+      if (i + 1 < n && ((str[i] - '0') * 10 + str[i + 1] - '0' < 27)) {
+        dp[i] += dp[i + 2];
+      }
+    }
+  }
+  return dp[0];
+}
+```
+
+## class20
+
+### lc516
+
+@求字符串最长回文子序列长度(可以不连续)
+
+暴力递归
+
+```java
+public int longestPalindromeSubseq(String s) {
+  char[] str = s.toCharArray();
+  int n = str.length;
+  return process(str, 0, n - 1);
+}
+
+public int process(char[] str, int start, int end) {
+  if (start == end) {
+    return 1;
+  }
+  if (start + 1 == end) {
+    return str[start] == str[end] ? 2 : 1;
+  }
+  // 分类: start和end是否做结果的开头结尾
+  int p1 = process(str, start + 1, end);
+  int p2 = process(str, start, end - 1);
+  int p3 = process(str, start + 1, end - 1);
+  int p4 = 0;
+  if (str[start] == str[end]) {
+    p4 = 2 + process(str, start + 1, end - 1);
+  }
+  return Math.max(Math.max(p1, p2), Math.max(p3, p4));
+}
+```
+
+动态规划
+
+```java
+public int longestPalindromeSubseq(String s) {
+  char[] str = s.toCharArray();
+  int n = str.length;
+  int[][] dp = new int[n][n];// start和end的范围为0到n-1
+  // base case: 两条对角线
+  dp[n - 1][n - 1] = 1;
+  for (int i = 0; i < n - 1; i++) {
+    dp[i][i] = 1;
+    dp[i][i + 1] = str[i] == str[i + 1] ? 2 : 1;
+  }
+  // 普遍位置依赖左 下 左下
+  // 从下往上 从左往右填表
+  for (int start = n - 3; start >= 0; start--) {
+    for (int end = start + 2; end < n; end++) {
+      // 每个位置取左 下 左下的最大值 即左/下一定比左下大 只需要取它们的较大值
+      dp[start][end] = Math.max(dp[start + 1][end], dp[start][end - 1]);
+      if (str[start] == str[end]) {
+        dp[start][end] = Math.max(dp[start][end], 2 + dp[start + 1][end - 1]);
+      }
+    }
+  }
+  return dp[0][n - 1];
 }
 ```

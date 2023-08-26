@@ -1,6 +1,43 @@
 package class19;
+
 //91
 public class Code02_ConvertToLetterString {
+
+	public int numDecodings1(String s) {
+		char[] str = s.toCharArray();
+		return process(str, 0);
+	}
+
+	public int process(char[] str, int i) {
+		if (i == str.length) {// 到达字符串末尾 转换有效
+			return 1;
+		}
+		if (str[i] == '0') {// 0开头的字符串无法转化 转换无效
+			return 0;
+		}
+		int ans = process(str, i + 1);// 当前字符单独转换
+		if (i + 1 < str.length && ((str[i] - '0') * 10 + str[i + 1] - '0' < 27)) {// 当前字符和下一个字符可以一起转换
+			ans += process(str, i + 2);
+		}
+		return ans;
+	}
+
+	public int numDecodings(String s) {
+		char[] str = s.toCharArray();
+		int n = str.length;
+		int[] dp = new int[n + 1];// i范围为0到n
+		dp[n] = 1;// base case
+		for (int i = n - 1; i >= 0; i--) {// 普遍位置依赖于右边两个位置
+			// str[i]为0时dp[i]填0
+			if (str[i] != '0') {
+				dp[i] = dp[i + 1];
+				if (i + 1 < n && ((str[i] - '0') * 10 + str[i + 1] - '0' < 27)) {
+					dp[i] += dp[i + 2];
+				}
+			}
+		}
+		return dp[0];
+	}
 
 	// str只含有数字字符0~9
 	// 返回多少种转化方案
@@ -8,12 +45,12 @@ public class Code02_ConvertToLetterString {
 		if (str == null || str.length() == 0) {
 			return 0;
 		}
-		return process(str.toCharArray(), 0);
+		return process1(str.toCharArray(), 0);
 	}
 
 	// str[0..i-1]转化无需过问
 	// str[i.....]去转化，返回有多少种转化方法
-	public static int process(char[] str, int i) {
+	public static int process1(char[] str, int i) {
 		if (i == str.length) {
 			return 1;
 		}
@@ -23,9 +60,9 @@ public class Code02_ConvertToLetterString {
 		}
 		// str[i] != '0'
 		// 可能性一，i单转
-		int ways = process(str, i + 1);
+		int ways = process1(str, i + 1);
 		if (i + 1 < str.length && (str[i] - '0') * 10 + str[i + 1] - '0' < 27) {
-			ways += process(str, i + 2);
+			ways += process1(str, i + 2);
 		}
 		return ways;
 	}

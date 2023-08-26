@@ -1,7 +1,56 @@
 package class20;
+
 //lc516
 // 测试链接：https://leetcode.com/problems/longest-palindromic-subsequence/
 public class Code01_PalindromeSubsequence {
+
+	public int longestPalindromeSubseq(String s) {
+		char[] str = s.toCharArray();
+		int n = str.length;
+		int[][] dp = new int[n][n];// start和end的范围为0到n-1
+		// base case: 两条对角线
+		dp[n - 1][n - 1] = 1;
+		for (int i = 0; i < n - 1; i++) {
+			dp[i][i] = 1;
+			dp[i][i + 1] = str[i] == str[i + 1] ? 2 : 1;
+		}
+		// 普遍位置依赖左 下 左下
+		// 从下往上 从左往右填表
+		for (int start = n - 3; start >= 0; start--) {
+			for (int end = start + 2; end < n; end++) {
+				// 每个位置取左 下 左下的最大值 即左/下一定比左下大 只需要取它们的较大值
+				dp[start][end] = Math.max(dp[start + 1][end], dp[start][end - 1]);
+				if (str[start] == str[end]) {
+					dp[start][end] = Math.max(dp[start][end], 2 + dp[start + 1][end - 1]);
+				}
+			}
+		}
+		return dp[0][n - 1];
+	}
+
+	public int longestPalindromeSubseq12(String s) {
+		char[] str = s.toCharArray();
+		int n = str.length;
+		return process(str, 0, n - 1);
+	}
+
+	public int process(char[] str, int start, int end) {
+		if (start == end) {
+			return 1;
+		}
+		if (start + 1 == end) {
+			return str[start] == str[end] ? 2 : 1;
+		}
+		// 分类: start和end是否做结果的开头结尾
+		int p1 = process(str, start + 1, end);
+		int p2 = process(str, start, end - 1);
+		int p3 = process(str, start + 1, end - 1);
+		int p4 = 0;
+		if (str[start] == str[end]) {
+			p4 = 2 + process(str, start + 1, end - 1);
+		}
+		return Math.max(Math.max(p1, p2), Math.max(p3, p4));
+	}
 
 	public static int lpsl1(String s) {
 		if (s == null || s.length() == 0) {
