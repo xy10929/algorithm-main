@@ -49,6 +49,9 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc91 字符串中 1 至 26 可解码为 a 到 z, 求可能的解码结果数](#lc91)
 - [class20](#class20)
   - [lc516 求字符串最长回文子序列长度](#lc516)
+- [class21](#class21)
+  - [lc64 求从矩阵左上开始 朝右或下走到右下的最小路径和](#lc64)
+  - [lc518 给定硬币面值数组 每种硬币数量无限 求组成 aim 的方法数](#lc518)
 
 ## class01
 
@@ -1454,5 +1457,100 @@ public int longestPalindromeSubseq(String s) {
     }
   }
   return dp[0][n - 1];
+}
+```
+
+## class21
+
+### lc64
+
+@求从矩阵左上朝右或下走到右下的最小路径和
+
+根据终点的位置建立递归函数
+
+```java
+public int minPathSum(int[][] grid) {
+  return process(grid, grid.length - 1, grid[0].length - 1);
+}
+
+public int process(int[][] grid, int i, int j) {
+  if (i == 0 && j == 0) {//base case
+    return grid[0][0];
+  }
+  if (i == 0) {
+    return grid[i][j] + process(grid, i, j - 1);
+  }
+  if (j == 0) {
+    return grid[i][j] + process(grid, i - 1, j);
+  }
+  return grid[i][j] + Math.min(process(grid, i, j - 1), process(grid, i - 1, j));
+}
+```
+
+动态规划
+
+```java
+public int minPathSum(int[][] grid) {
+  int n = grid.length;
+  int m = grid[0].length;
+  int[][] dp = new int[n][m];
+  dp[0][0] = grid[0][0];
+  for (int j = 1; j < m; j++) {
+    dp[0][j] = grid[0][j] + dp[0][j - 1];
+  }
+  for (int i = 1; i < n; i++) {
+    dp[i][0] = grid[i][0] + dp[i - 1][0];
+  }
+  for (int i = 1; i < n; i++) {
+    for (int j = 1; j < m; j++) {
+      dp[i][j] = grid[i][j] + Math.min(dp[i][j - 1], dp[i - 1][j]);
+    }
+  }
+  return dp[n - 1][m - 1];
+}
+```
+
+### lc518
+
+@给定硬币面值数组 每种硬币数量无限 求组成 aim 的方法数
+
+递归函数  
+求从数组 i 位置开始 组成 sum 的方法数
+
+```java
+public int change(int amount, int[] coins) {
+  return process(coins, 0, amount);
+}
+
+public int process(int[] arr, int i, int sum) {
+  if (i == arr.length) {// base case 没有硬币可以选择了 判断剩下要组成的总数是否为0
+    return sum == 0 ? 1 : 0;
+  }
+  int ans = 0;
+  for (int num = 0; arr[i] * num <= sum; num++) {// 当前面额arr[i]用num个
+    ans += process(arr, i + 1, sum - arr[i] * num);
+  }
+  return ans;
+}
+```
+
+动态规划  
+每个位置填表时都要经过一个 for 循环 即每个位置由其下和下每次向左 arr[i]的位置决定  
+进一步转换为由下和向左 arr[i]位置决定(如果存在)
+
+```java
+public int change(int amount, int[] coins) {
+  int n = coins.length;
+  int[][] dp = new int[n + 1][amount + 1];
+  dp[n][0] = 1;//base case
+  for (int i = n - 1; i >= 0; i--) {
+    for (int j = 0; j <= amount; j++) {
+      dp[i][j] = dp[i + 1][j];
+      if (j >= coins[i]) {
+        dp[i][j] += dp[i][j - coins[i]];
+      }
+    }
+  }
+  return dp[0][amount];
 }
 ```
