@@ -111,29 +111,29 @@ public class Code03_CoinsWayNoLimit {
 		System.out.println();
 	}
 
-	// 为了测试
-	public static void main(String[] args) {
-		int maxLen = 10;
-		int maxValue = 30;
-		int testTime = 1000000;
-		System.out.println("测试开始");
-		for (int i = 0; i < testTime; i++) {
-			int[] arr = randomArray(maxLen, maxValue);
-			int aim = (int) (Math.random() * maxValue);
-			int ans1 = coinsWay(arr, aim);
-			int ans2 = dp1(arr, aim);
-			int ans3 = dp2(arr, aim);
-			if (ans1 != ans2 || ans1 != ans3) {
-				System.out.println("Oops!");
-				printArray(arr);
-				System.out.println(aim);
-				System.out.println(ans1);
-				System.out.println(ans2);
-				System.out.println(ans3);
-				break;
-			}
-		}
-		System.out.println("测试结束");
-	}
+//	// 为了测试
+//	public static void main(String[] args) {
+//		int maxLen = 10;
+//		int maxValue = 30;
+//		int testTime = 1000000;
+//		System.out.println("测试开始");
+//		for (int i = 0; i < testTime; i++) {
+//			int[] arr = randomArray(maxLen, maxValue);
+//			int aim = (int) (Math.random() * maxValue);
+//			int ans1 = coinsWay(arr, aim);
+//			int ans2 = dp1(arr, aim);
+//			int ans3 = dp2(arr, aim);
+//			if (ans1 != ans2 || ans1 != ans3) {
+//				System.out.println("Oops!");
+//				printArray(arr);
+//				System.out.println(aim);
+//				System.out.println(ans1);
+//				System.out.println(ans2);
+//				System.out.println(ans3);
+//				break;
+//			}
+//		}
+//		System.out.println("测试结束");
+//	}
 
 }

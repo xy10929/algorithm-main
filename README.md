@@ -52,6 +52,7 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
 - [class21](#class21)
   - [lc64 求从矩阵左上开始 朝右或下走到右下的最小路径和](#lc64)
   - [lc518 给定硬币面值数组 每种硬币数量无限 求组成 aim 的方法数](#lc518)
+  - [lc576 给定矩阵规模和初始位置 求最多 k 步后出界的 path 数](#lc576)
 
 ## class01
 
@@ -1552,5 +1553,69 @@ public int change(int amount, int[] coins) {
     }
   }
   return dp[0][amount];
+}
+```
+
+### lc576
+
+@给定矩阵规模和初始位置 求最多 k 步后出界的 path 数
+
+暴力递归  
+递归函数参数: 当前位置和剩余的步数
+
+```java
+public int findPaths(int m, int n, int maxMove, int startRow, int startColumn) {
+  return (int) process(m, n, startRow, startColumn, maxMove);
+}
+
+public long process(int n, int m, int row, int col, int k) {
+  if (row < 0 || row == n || col < 0 || col == m) {// 越界 形成有效path
+    return 1;
+  }
+  if (k == 0) {// 未越界
+    return 0;
+  }
+  int mod = 1000000007;
+  long up = process(n, m, row + 1, col, k - 1);
+  long down = process(n, m, row - 1, col, k - 1);
+  long left = process(n, m, row, col - 1, k - 1);
+  long right = process(n, m, row, col + 1, k - 1);
+  return (up + down + left + right) % mod;
+}
+```
+
+记忆化搜索
+
+```java
+public int findPaths(int n, int m, int maxMove, int startRow, int startColumn) {
+  long[][][] dp = new long[n][m][maxMove + 1];
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      for (int k = 0; k <= maxMove; k++) {
+        dp[i][j][k] = -1;
+      }
+    }
+  }
+  return (int) process(n, m, startRow, startColumn, maxMove, dp);
+}
+
+public long process(int n, int m, int row, int col, int k, long[][][] dp) {
+  if (row < 0 || row == n || col < 0 || col == m) {
+    return 1;
+  }
+  if (dp[row][col][k] != -1) {
+    return dp[row][col][k];
+  }
+  long ans = 0;
+  if (k != 0) {
+    int mod = 1000000007;
+    long up = process(n, m, row + 1, col, k - 1, dp);
+    long down = process(n, m, row - 1, col, k - 1, dp);
+    long left = process(n, m, row, col - 1, k - 1, dp);
+    long right = process(n, m, row, col + 1, k - 1, dp);
+    ans = (up + down + left + right) % mod;
+  }
+  dp[row][col][k] = ans;
+  return ans;
 }
 ```
