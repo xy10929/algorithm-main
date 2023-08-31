@@ -53,6 +53,7 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc64 求从矩阵左上开始 朝右或下走到右下的最小路径和](#lc64)
   - [lc518 给定硬币面值数组 每种硬币数量无限 求组成 aim 的方法数](#lc518)
   - [lc576 给定矩阵规模和初始位置 求最多 k 步后出界的 path 数](#lc576)
+  - [lc322 给定硬币面值数组 每种硬币数量无限 求组成 aim 的最少硬币数](#lc322)
 
 ## class01
 
@@ -1617,5 +1618,56 @@ public long process(int n, int m, int row, int col, int k, long[][][] dp) {
   }
   dp[row][col][k] = ans;
   return ans;
+}
+```
+
+### lc322
+
+@给定硬币面值数组 每种硬币数量无限 求组成 aim 的最少硬币数
+
+递归函数
+求从数组 i 位置开始 组成 sum 的最少硬币数
+
+```java
+public int coinChange(int[] coins, int amount) {
+  int ans = process(coins, 0, amount);
+  return ans == Integer.MAX_VALUE ? -1 : ans;
+}
+
+public int process(int[] arr, int i, int sum) {
+  if (i == arr.length) {// 到达末尾时 只有sum为0才有效
+    return sum == 0 ? 0 : Integer.MAX_VALUE;// 无效结果也设为Integer.MAX_VALUE
+  }
+  int ans = Integer.MAX_VALUE;// 确保在与有效结果求min时落败
+  for (int num = 0; num * arr[i] <= sum; num++) {// 当前位置可能要也可能不要 所以从num从0开始尝试
+    int n = process(arr, i + 1, sum - num * arr[i]);
+    if (n != Integer.MAX_VALUE) {// 当前num有效
+      ans = Math.min(ans, num + n);
+    }
+  }
+  return ans;
+}
+```
+
+动态规划  
+每个位置由其下, 下向左 arr[i]+ 1, 下再向左 arr[i]+2...的最小值决定  
+所以除了下以外的其他项最小值可以转换为 1+左 arr[i]
+
+```java
+public int coinChange(int[] arr, int sum) {
+  int n = arr.length;
+  int[][] dp = new int[n + 1][sum + 1];
+  for (int j = 1; j <= sum; j++) {// base case
+    dp[n][j] = Integer.MAX_VALUE;
+  }
+  for (int i = n - 1; i >= 0; i--) {
+    for (int j = 0; j <= sum; j++) {
+      dp[i][j] = dp[i + 1][j];
+      if (j >= arr[i] && dp[i][j - arr[i]] != Integer.MAX_VALUE) {// 防止1+左arr[i]溢出
+        dp[i][j] = Math.min(dp[i][j], 1 + dp[i][j - arr[i]]);
+      }
+    }
+  }
+  return dp[0][sum] == Integer.MAX_VALUE ? -1 : dp[0][sum];
 }
 ```

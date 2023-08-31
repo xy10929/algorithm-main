@@ -52,7 +52,6 @@ public class Code05_BobDie {
 		if (row < 0 || row == n || col < 0 || col == m) {
 			return 1;
 		}
-
 		if (dp[row][col][k] != -1) {
 			return dp[row][col][k];
 		}
