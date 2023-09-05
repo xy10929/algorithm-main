@@ -54,6 +54,8 @@ Leetcode problems in data stucture & algorithm course by [Chengyun Zuo](https://
   - [lc518 给定硬币面值数组 每种硬币数量无限 求组成 aim 的方法数](#lc518)
   - [lc576 给定矩阵规模和初始位置 求最多 k 步后出界的 path 数](#lc576)
   - [lc322 给定硬币面值数组 每种硬币数量无限 求组成 aim 的最少硬币数](#lc322)
+- [class23](#class23)
+  - [lc52 N 皇后问题](#lc52)
 
 ## class01
 
@@ -1669,5 +1671,41 @@ public int coinChange(int[] arr, int sum) {
     }
   }
   return dp[0][sum] == Integer.MAX_VALUE ? -1 : dp[0][sum];
+}
+```
+
+## class23
+
+### lc52
+
+@N 皇后问题
+
+```java
+public int totalNQueens(int n) {
+  int[] record = new int[n];// record[i,j]表示第i行把皇后放在j列
+  return process(0, n, record);
+}
+
+public int process(int i, int n, int[] record) {
+  if (i == n) {// 有效策略
+    return 1;
+  }
+  int ans = 0;
+  for (int j = 0; j < n; j++) {// 尝试该行的每个位置是否可以放皇后
+    if (isValid(record, i, j)) {
+      record[i] = j;
+      ans += process(i + 1, n, record);
+    }
+  }
+  return ans;
+}
+
+public boolean isValid(int[] record, int i, int j) {// record[]已记录0至i-1行皇后位置 检查(i,j)位置是否有效
+  for (int row = 0; row < i; row++) {// 0至i-1行各有一个位置放着皇后
+    if (record[row] == j || Math.abs(row - i) == Math.abs(record[row] - j)) {// [row,record[row]]位置不能和(i,j)共列或共斜线(斜率为1)
+      return false;
+    }
+  }
+  return true;
 }
 ```
